@@ -1,0 +1,73 @@
+def is_valid(board, row, col, num):
+    # Check if the number is not repeated in the row
+    for x in range(9):
+        if board[row][x] == num:
+            return False
+
+    # Check if the number is not repeated in the column
+    for x in range(9):
+        if board[x][col] == num:
+            return False
+
+    # Check if the number is not repeated in the 3x3 grid
+    start_row, start_col = 3 * (row // 3), 3 * (col // 3)
+    for i in range(3):
+        for j in range(3):
+            if board[i + start_row][j + start_col] == num:
+                return False
+
+    return True
+
+def solve_sudoku(board):
+    # Find an empty cell (represented by 0)
+    for row in range(9):
+        for col in range(9):
+            if board[row][col] == 0:
+                # Try numbers from 1 to 9
+                for num in range(1, 10):
+                    if is_valid(board, row, col, num):
+                        # Place the number
+                        board[row][col] = num
+
+                        # Recursively try to solve the rest of the board
+                        if solve_sudoku(board):
+                            return True
+
+                        # If placing num doesn't lead to a solution, reset the cell
+                        board[row][col] = 0
+
+                # If no valid number is found, backtrack
+                return False
+
+    # If no empty cells are found, the Sudoku is solved
+    return True
+
+def print_board(board):
+    for row in board:
+        print(" ".join(str(num) for num in row))
+
+def get_input():
+    board = []
+    print("Enter the Sudoku puzzle row by row. Use 0 for empty cells.")
+    for i in range(9):
+        while True:
+            try:
+                row = list(map(int, input(f"Enter row {i+1} (9 numbers separated by space): ").split()))
+                if len(row) == 9 and all(0 <= num <= 9 for num in row):
+                    board.append(row)
+                    break
+                else:
+                    print("Invalid row! Please enter exactly 9 numbers between 0 and 9.")
+            except ValueError:
+                print("Invalid input! Please enter numbers separated by spaces.")
+    return board
+
+# Main program
+sudoku_board = get_input()
+
+# Solve the Sudoku puzzle
+if solve_sudoku(sudoku_board):
+    print("\nSolved Sudoku Puzzle:")
+    print_board(sudoku_board)
+else:
+    print("\nNo solution exists.")
